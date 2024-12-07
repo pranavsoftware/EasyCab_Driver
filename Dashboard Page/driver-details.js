@@ -18,23 +18,31 @@ const db = getFirestore(app);
 
 // Get the driver ID from the URL query parameter
 const urlParams = new URLSearchParams(window.location.search);
-const driverId = urlParams.get('driverId'); // e.g., driverId=12345
+const driverId = urlParams.get('uid'); // Ensure this matches the parameter used in the QR code
+
+console.log("Driver ID (UID): ", driverId); // Log to check if the ID is correctly passed
 
 // Fetch driver details from Firestore
-const docRef = doc(db, "drivers", driverId);
-getDoc(docRef).then((docSnap) => {
-    if (docSnap.exists()) {
-        const driverData = docSnap.data();
+if (driverId) {
+    const docRef = doc(db, "drivers", driverId);
+    getDoc(docRef).then((docSnap) => {
+        if (docSnap.exists()) {
+            const driverData = docSnap.data();
 
-        // Populate the driver details on the page
-        document.getElementById('driverName').textContent = driverData.name;
-        document.getElementById('driverEmail').textContent = driverData.email;
-        document.getElementById('driverPhone').textContent = driverData.phone;
-        document.getElementById('driverLicense').textContent = driverData.license;
-        document.getElementById('taxiNumber').textContent = driverData.taxiNumber;
-        document.getElementById('driverAddress').textContent = driverData.address;
-        document.getElementById('driverPic').src = driverData.picUrl;
-    } else {
-        console.log("No such driver found!");
-    }
-});
+            // Populate the driver details on the page
+            document.getElementById('driverName').textContent = driverData.name;
+            document.getElementById('driverEmail').textContent = driverData.email;
+            document.getElementById('driverPhone').textContent = driverData.phone;
+            document.getElementById('driverLicense').textContent = driverData.license;
+            document.getElementById('taxiNumber').textContent = driverData.taxiNumber;
+            document.getElementById('driverAddress').textContent = driverData.address;
+            document.getElementById('driverPic').src = driverData.picUrl;
+        } else {
+            console.log("No such driver found!");
+        }
+    }).catch((error) => {
+        console.error("Error fetching driver data: ", error);
+    });
+} else {
+    console.log("No driver ID provided in the URL.");
+}
