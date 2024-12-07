@@ -18,6 +18,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Suppress console logs and errors
+console.log = function () {}; // Disable console.log
+console.error = function () {}; // Disable console.error
+
 // Sidebar toggle functionality
 const menuBtn = document.getElementById('menuBtn');
 const sidebar = document.getElementById('sidebar');
@@ -28,56 +32,52 @@ menuBtn.addEventListener('click', () => {
 // Get the current logged-in driver
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        const driverId = user.uid;
-        const docRef = doc(db, "drivers", driverId);
-        const docSnap = await getDoc(docRef);
+        try {
+            const driverId = user.uid; // Firestore document ID = UID
+            const docRef = doc(db, "drivers", driverId);
+            const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            const driverData = docSnap.data();
-            document.getElementById('driverName').textContent = driverData.name;
-            document.getElementById('driverEmail').textContent = driverData.email;
-            document.getElementById('driverPhone').textContent = driverData.phone;
-            document.getElementById('driverLicense').textContent = driverData.license;
-            document.getElementById('taxiNumber').textContent = driverData.taxiNumber;
-            document.getElementById('driverAddress').textContent = driverData.address;
-            document.getElementById('driverPic').src = driverData.picUrl;
+            if (docSnap.exists()) {
+                const driverData = docSnap.data();
 
-            // Generate QR Code with driver UID for redirection
-            const qrCodeData = `https://cabdriver.easycab.site/Dashboard%20Page/driver-details.html?uid=${driverData.uid}`; // URL for redirection
-            new QRCode(document.getElementById('qrcode'), {
-                text: qrCodeData, // The URL for redirection
-                width: 200,
-                height: 200,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H,
-            });
-        } else {
-            console.log("No such driver found!");
+                // Populate driver data in the dashboard
+                document.getElementById('driverName').textContent = driverData.name;
+                document.getElementById('driverEmail').textContent = driverData.email;
+                document.getElementById('driverPhone').textContent = driverData.phone;
+                document.getElementById('driverLicense').textContent = driverData.license;
+                document.getElementById('taxiNumber').textContent = driverData.taxiNumber;
+                document.getElementById('driverAddress').textContent = driverData.address;
+                document.getElementById('driverPic').src = driverData.picUrl;
+
+                // Generate the QR code with the full driver UID
+                const qrCodeContainer = document.getElementById("qrcode");
+                const qr = new QRCode(qrCodeContainer, {
+                    text: driverId, // Use the full driver UID as the QR code data
+                    width: 128,
+                    height: 128,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } else {
+                // No logs here as console.log is disabled
+            }
+        } catch (error) {
+            // No error logs here as console.error is disabled
         }
     } else {
-        console.log("No user is logged in.");
+        // No logs here as console.log is disabled
+        window.location.href = '../Login Page/index.html'; // Redirect to login page
     }
 });
 
-// Get the logout button and set up the click listener
+// Logout functionality
 const logoutBtn = document.getElementById('logoutBtn');
-
 logoutBtn.addEventListener('click', async () => {
-    const auth = getAuth();
-    
     try {
-        // Sign out the user
         await signOut(auth);
-        console.log('User signed out.');
-
-        // Redirect to the login page
         window.location.href = '../Login Page/index.html';
-
-        // Prevent back navigation
-        window.history.replaceState(null, '', '../Login Page/index.html');  // Replace the current history entry with the login page
-
     } catch (error) {
-        console.error('Error signing out: ', error);
+        // No error logs here as console.error is disabled
     }
 });
