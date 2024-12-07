@@ -67,7 +67,7 @@ onAuthStateChanged(auth, async (user) => {
         }
     } else {
         // No logs here as console.log is disabled
-        window.location.href = '../Login Page/index.html'; // Redirect to login page
+        window.location.href = 'index.html'; // Redirect to login page
     }
 });
 
@@ -76,7 +76,7 @@ const logoutBtn = document.getElementById('logoutBtn');
 logoutBtn.addEventListener('click', async () => {
     try {
         await signOut(auth);
-        window.location.href = '../Login Page/index.html';
+        window.location.href = 'index.html';
     } catch (error) {
         // No error logs here as console.error is disabled
     }
