@@ -39,9 +39,11 @@ if (driverId) {
             document.getElementById('driverPic').src = driverData.picUrl;
         } else {
             console.log("No such driver found!");
+            // Optionally show an error message to the user
         }
     }).catch((error) => {
         console.error("Error fetching driver data: ", error);
+        // Optionally show an error message to the user
     });
 } else {
     console.log("No driver ID provided in the URL.");
